@@ -5,6 +5,11 @@ import 'package:path_provider/path_provider.dart';
 class DiskStorage {
   Future<Directory> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
+    // final tempDir = await getTemporaryDirectory();
+    // final externalStorage = await getExternalStorageDirectory();
+    // final listExternalStorage = await getExternalStorageDirectories();
+    // final externalCacheStorage = await getExternalCacheDirectories();
+    // final applicationSpDir = await getApplicationSupportDirectory();
     return directory;
   }
 

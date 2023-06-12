@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:testing/disk_storage.dart';
+import 'package:testing/database/disk_storage.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.storage}) : super(key: key);
@@ -11,7 +11,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   String text = "";
 
   @override
@@ -24,6 +23,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
+        appBar: AppBar(
+          title: const Text("My App"),
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -51,5 +53,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
 }
