@@ -1,29 +1,56 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:testing/app_provider/theme_provider.dart';
 import 'package:testing/configs/app_color.dart';
 import 'package:testing/configs/app_text_style.dart';
+import 'package:testing/database/disk_storage.dart';
+import 'package:testing/database/shared_preference.dart';
 import 'package:testing/model/screen_theme.dart';
+import 'package:testing/ui/home/home_provider.dart';
+import 'package:testing/ui/note_detail/note_detail.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key, required this.storage}) : super(key: key);
+
+  final DiskStorage storage;
 
   @override
   Widget build(BuildContext context) {
-    return const _HomePage();
+    return _HomePage(
+      diskStorage: storage,
+    );
   }
 }
 
 class _HomePage extends StatefulWidget {
-  const _HomePage({Key? key}) : super(key: key);
+  const _HomePage({Key? key, required this.diskStorage}) : super(key: key);
+
+  final DiskStorage diskStorage;
 
   @override
   State<_HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<_HomePage> {
+  late HomeProvider homeProvider;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void initialListFile(HomeProvider homeProvider) async {
+    widget.diskStorage.getAllFilesInDirectory().then((listFiles) {
+      homeProvider.files = listFiles;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    homeProvider = Provider.of<HomeProvider>(context);
+    initialListFile(homeProvider);
     return Consumer<ThemeProvider>(
       builder: (context, themeProvider, child) {
         return Scaffold(
@@ -83,12 +110,36 @@ class _HomePageState extends State<_HomePage> {
               ],
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              themeProvider.changeTheme();
-            },
-            backgroundColor: AppColor.greenAccent,
-            child: const Icon(Icons.change_circle_outlined),
+          floatingActionButton: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NoteDetail(
+                        isNewFile: true,
+                        indexFile: DiskStorage.numberFile,
+                        storage: widget.diskStorage,
+                      ),
+                    ),
+                  );
+                },
+                backgroundColor: AppColor.greenAccent,
+                child: const Icon(Icons.add),
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              FloatingActionButton(
+                onPressed: () {
+                  themeProvider.changeTheme();
+                },
+                backgroundColor: AppColor.greenAccent,
+                child: const Icon(Icons.change_circle_outlined),
+              ),
+            ],
           ),
         );
       },
@@ -96,11 +147,39 @@ class _HomePageState extends State<_HomePage> {
   }
 
   Widget _buildListNote() {
-    return ListView(
+    return ListView.builder(
+      padding: EdgeInsets.zero,
       shrinkWrap: true,
-      children: [],
+      itemCount: homeProvider.files.length,
+      itemBuilder: (BuildContext context, int index) {
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NoteDetail(
+                  isNewFile: false,
+                  indexFile: index,
+                  storage: widget.diskStorage,
+                ),
+              ),
+            );
+          },
+          child: Card(
+            color: AppColor.lightSecondary,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "test${index}.txt",
+                style: const TextStyle(
+                  color: AppColor.lightPlaceholder,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
-
-
 }

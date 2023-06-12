@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:testing/app_provider/theme_provider.dart';
+import 'package:testing/database/disk_storage.dart';
+import 'package:testing/ui/home/home_provider.dart';
+import 'package:testing/ui/note_detail/note_detail.dart';
 import 'package:testing/ui/home/home_page.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +15,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) {
-        return ThemeProvider();
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => ThemeProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => HomeProvider(),
+        ),
+      ],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -24,20 +32,13 @@ class MyApp extends StatelessWidget {
         ),
         // home: MyHomePage(
         //   storage: DiskStorage(),
+        //   indexFile: DiskStorage.numberFile,
+        //   isNewFile: true,
         // ),
-        home: const HomePage(),
+        home: HomePage(
+          storage: DiskStorage(),
+        ),
       ),
     );
-    // return MaterialApp(
-    //   title: 'Flutter Demo',
-    //   theme: ThemeData(
-    //     primarySwatch: Colors.blue,
-    //     fontFamily: 'Poppins',
-    //   ),
-    //   // home: MyHomePage(
-    //   //   storage: DiskStorage(),
-    //   // ),
-    //   home: const HomePage(),
-    // );
   }
 }
